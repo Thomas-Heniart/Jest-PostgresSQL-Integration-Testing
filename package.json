@@ -1,0 +1,35 @@
+{
+  "name": "jesr-psql-integration-testing",
+  "version": "1.0.0",
+  "description": "How to setup an integration test process with NodeJS/TypeScript, Jest and PostgreSQL and execute it on a CI environment",
+  "scripts": {
+    "test": "jest",
+    "test-problematic": "jest src/__test__/problematic",
+    "test-solution": "jest src/__test__/solution",
+    "test-psql-client-solution": "jest src/__test__/psql-client-solution"
+  },
+  "engines": {
+    "node": ">=18.14.0"
+  },
+  "dependencies": {
+    "dotenv": "^16.0.3",
+    "ts-postgres": "^1.3.0",
+    "uuid": "^9.0.0"
+  },
+  "devDependencies": {
+    "@jest/globals": "^29.4.1",
+    "@types/jest": "^29.4.0",
+    "@types/node": "^14.14.25",
+    "jest": "^29.4.1",
+    "prettier": "^2.8.3",
+    "rimraf": "^4.1.2",
+    "ts-jest": "^29.0.5",
+    "ts-node": "^10.4.0",
+    "typescript": "^4.1.3"
+  },
+  "author": {
+    "name": "Thomas Heniart",
+    "email": "heniart.thomas@gmail.com"
+  },
+  "license": "MIT"
+}

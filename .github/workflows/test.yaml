@@ -1,0 +1,132 @@
+name: test
+on: [ push ]
+jobs:
+  test-problematic:
+    runs-on: ubuntu-latest
+    container: node:18.14
+    services:
+      postgres:
+        image: postgres:15.2
+        env:
+          POSTGRES_DB: jest-psql-example
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: example
+          POSTGRES_HOST_AUTH_METHOD: trust
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+      - run: npm install -g yarn
+      - run: yarn
+      - name: Run migrations
+        env:
+          DB_HOST: "postgres"
+          DB_USER: "postgres"
+          PGPASSWORD: "example"
+          DB_NAME: "jest-psql-example"
+        run: |
+          apt-get update
+          apt-get install --yes postgresql-client
+          for f in ./sql/*.sql; do psql -h ${DB_HOST} -U ${DB_USER} -d ${DB_NAME} -a -f $f > /dev/null; done
+      - name: Test problematic
+        env:
+          DB_HOST: "postgres"
+          DB_PORT: "5432"
+          DB_USER: "postgres"
+          DB_PASSWORD: "example"
+          DB_NAME: "jest-psql-example"
+        run: $(./concurrent-test.sh test-problematic > /dev/null 2>&1) && exit1 || echo "Failed as expected"
+  test-solution:
+    runs-on: ubuntu-latest
+    container: node:18.14
+    services:
+      postgres:
+        image: postgres:15.2
+        env:
+          POSTGRES_DB: jest-psql-example
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: example
+          POSTGRES_HOST_AUTH_METHOD: trust
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+      - run: npm install -g yarn
+      - run: yarn
+      - name: Run migrations
+        env:
+          DB_HOST: "postgres"
+          DB_USER: "postgres"
+          PGPASSWORD: "example"
+          DB_NAME: "jest-psql-example"
+        run: |
+          apt-get update
+          apt-get install --yes postgresql-client
+          for f in ./sql/*.sql; do psql -h ${DB_HOST} -U ${DB_USER} -d ${DB_NAME} -a -f $f > /dev/null; done
+      - name: Test solution
+        env:
+          DB_HOST: "postgres"
+          DB_PORT: "5432"
+          DB_USER: "postgres"
+          DB_PASSWORD: "example"
+          DB_NAME: "jest-psql-example"
+        run: $(./concurrent-test.sh test-solution > /dev/null 2>&1) && echo "Succeed as expected" || exit 1
+  test-psql-client-solution:
+    runs-on: ubuntu-latest
+    container: node:18.14
+    services:
+      postgres:
+        image: postgres:15.2
+        env:
+          POSTGRES_DB: jest-psql-example
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: example
+          POSTGRES_HOST_AUTH_METHOD: trust
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+      - run: npm install -g yarn
+      - run: yarn
+      - name: Run migrations
+        env:
+          DB_HOST: "postgres"
+          DB_USER: "postgres"
+          PGPASSWORD: "example"
+          DB_NAME: "jest-psql-example"
+        run: |
+          apt-get update
+          apt-get install --yes postgresql-client
+          for f in ./sql/*.sql; do psql -h ${DB_HOST} -U ${DB_USER} -d ${DB_NAME} -a -f $f > /dev/null; done
+      - name: Test solution
+        env:
+          DB_HOST: "postgres"
+          DB_PORT: "5432"
+          DB_USER: "postgres"
+          DB_PASSWORD: "example"
+          DB_NAME: "jest-psql-example"
+        run: $(./concurrent-test.sh test-psql-client-solution > /dev/null 2>&1) && echo "Succeed as expected" || exit 1

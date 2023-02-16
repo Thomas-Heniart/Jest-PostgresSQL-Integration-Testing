@@ -1,0 +1,38 @@
+stages:
+  - test
+
+.test-template:
+  stage: test
+  image: node:18.14.0
+  services:
+    - name: postgres:15.2
+      alias: postgres
+  variables:
+    POSTGRES_DB: jest-psql-example
+    POSTGRES_USER: postgres
+    POSTGRES_PASSWORD: example
+    POSTGRES_HOST_AUTH_METHOD: trust
+    DB_HOST: "postgres"
+    DB_PORT: "5432"
+    DB_USER: "postgres"
+    DB_PASSWORD: "example"
+    DB_NAME: "jest-psql-example"
+  before_script:
+    - apt-get update && apt-get install -y postgresql-client
+    - yarn
+    - for f in ./sql/*.sql; do psql -h ${DB_HOST} -U ${DB_USER} -d ${DB_NAME} -a -f $f > /dev/null; done
+
+test-problematic:
+  extends: .test-template
+  script:
+    - $(./concurrent-test.sh test-problematic > /dev/null 2>&1) && exit 1 || echo "Failed as expected"
+
+test-solution:
+  extends: .test-template
+  script:
+    - $(./concurrent-test.sh test-solution > /dev/null 2>&1) && echo "Succeed as expected" || exit 1
+
+test-psql-client-solution:
+  extends: .test-template
+  script:
+    - $(./concurrent-test.sh test-psql-client-solution > /dev/null 2>&1) && echo "Succeed as expected" || exit 1

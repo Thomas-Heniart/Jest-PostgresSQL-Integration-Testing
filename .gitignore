@@ -1,0 +1,11 @@
+# package directories
+node_modules/
+
+# coverage directories
+coverage/
+
+# build directories
+build/
+
+# IDE directories
+.idea/
